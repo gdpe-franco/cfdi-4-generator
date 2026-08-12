@@ -1,0 +1,6 @@
+services:
+  php:
+    build: .
+    working_dir: /var/www/html
+    volumes:
+      - ./laravel:/var/www/html
