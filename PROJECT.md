@@ -33,7 +33,7 @@ It is a demonstration only. PAC integration, timbrado, CSD files, certificates, 
 - Store the official `cfdv40.xsd` and its local SAT dependencies under `laravel/resources/xsd/`.
 - Verify the Docker image can install dependencies and expose `bcmath`, DOM, and libxml.
 
-### 2. Input contract and calculation domain — pending
+### 2. Input contract and calculation domain — complete
 
 - Define the JSON contract and explicit input/business checks.
 - Calculate concept amounts, IVA, subtotal, transferred taxes, and total using `bcmath`.
@@ -58,4 +58,4 @@ It is a demonstration only. PAC integration, timbrado, CSD files, certificates, 
 ### 6. Verification and documentation — pending
 
 - Add behavior-focused PHPUnit coverage for totals, successful generation/validation, and failures.
-- Write the README, run Pint and tests through Docker, and generate the example XML.
+- Polish the README, run Pint and tests through Docker, and generate the example XML.
