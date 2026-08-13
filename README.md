@@ -22,3 +22,5 @@ docker compose run --rm php php artisan test
 ```
 
 See [PROJECT.md](PROJECT.md) for the current requirements and delivery phases.
+
+See [CFDI_STUDY.md](docs/CFDI_STUDY.md) for a phased learning guide and official SAT references.
