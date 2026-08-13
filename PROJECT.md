@@ -55,7 +55,7 @@ It is a demonstration only. PAC integration, timbrado, CSD files, certificates, 
 - Add `cfdi:40:generate`, fixed output, clear summaries, and non-zero failure statuses.
 - Generate and commit the example XML.
 
-### 6. Verification and documentation — pending
+### 6. Verification and documentation — complete
 
 - Add behavior-focused PHPUnit coverage for totals, successful generation/validation, and failures.
 - Polish the README, run Pint and tests through Docker, and generate the example XML.

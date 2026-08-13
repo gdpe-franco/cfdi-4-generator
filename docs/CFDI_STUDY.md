@@ -67,6 +67,21 @@ Tax/accounting rules: correct treatment of the underlying operation
 5. Why does CfdiUtils need PHP's XSL extension even though our own structural validator only uses DOMDocument and libxml?
 6. Why must an offline XML resolver reject a missing resource instead of silently downloading it?
 
+## Phase 5 — Command and artifact
+
+1. Why does `cfdi:40:generate` use `40` rather than `4.0` in its Artisan name, while the XML attribute remains `Version="4.0"`?
+2. Why does this project deliberately write to one fixed path, `storage/app/cfdi/cfdi.xml`? What operating risk would need a different policy in a multi-user or concurrent system?
+3. Trace the command flow from JSON file to terminal result. Which component owns input validation, calculations, XML construction, disk writing, XSD validation, and advisory findings?
+4. Why does the command return a non-zero status for invalid input or failed XSD validation, but not for an expected demonstration `SELLO01` warning?
+5. If an XSD error reports a line and column, what should you inspect first in the generated XML and in the relevant XSD definition?
+
+## Phase 6 — Delivery and verification
+
+1. Why is the generated `cfdi.xml` committed even though `storage/app/` is normally ignored by Laravel projects?
+2. What does the command’s successful XSD result prove? List three facts that it still cannot prove about a real fiscal transaction.
+3. Explain how the README’s exact Docker commands make the project reproducible for a reviewer who has no PHP installation.
+4. Why do the tests cover concise happy and failure paths rather than attempting to reproduce every SAT catalog and PAC rule?
+
 ## How to use this guide
 
 - Answer one phase before moving to the next implementation phase.
