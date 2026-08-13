@@ -58,6 +58,13 @@ Tax/accounting rules: correct treatment of the underlying operation
 10. Why does `CfdiXmlGenerator` return a `DOMDocument` rather than writing a file itself? Which layer should report write failures to the user?
 11. Compare `Ingreso`, `Egreso`, `Traslado`, `Pago`, and `Nómina`. Why does supporting a new `TipoDeComprobante` require more than accepting a new letter?
 
+## Phase 4 — Structural validation
+
+1. Why should `DOMDocument::schemaValidate()` receive the local `cfdv40.xsd` file even when the XML already contains `xsi:schemaLocation`?
+2. Why must `libxml_use_internal_errors(true)` be restored after validation? What would be the risk of printing libxml errors directly from the service?
+3. What does a libxml line/column/message error tell a command user, and why is it more useful than a simple `false` validation result?
+4. Why is a successful XSD result the structural pass/fail gate, while CfdiUtils findings are advisory in this technical test?
+
 ## How to use this guide
 
 - Answer one phase before moving to the next implementation phase.
