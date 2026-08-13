@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Services\Cfdi\V40\AdvisoryValidator;
 use App\Services\Cfdi\V40\CalculationDispatcher;
 use App\Services\Cfdi\V40\XmlGenerator;
+use App\Services\Cfdi\V40\XsdValidator;
 use Illuminate\Console\Command;
 use InvalidArgumentException;
 use JsonException;
@@ -18,12 +20,17 @@ class GenerateCfdi40 extends Command
 
     protected $description = 'Generate a CFDI 4.0 XML file from JSON input';
 
-    public function handle(CalculationDispatcher $calculator, XmlGenerator $generator): int
-    {
+    public function handle(
+        CalculationDispatcher $calculator,
+        XmlGenerator $generator,
+        XsdValidator $xsdValidator,
+        AdvisoryValidator $advisoryValidator,
+    ): int {
         try {
             $calculation = $calculator->calculate($this->inputData());
             $output = base_path('storage/app/cfdi/cfdi.xml');
-            $xml = $generator->generate($calculation)->saveXML();
+            $document = $generator->generate($calculation);
+            $xml = $document->saveXML();
 
             if ($xml === false) {
                 throw new RuntimeException('Unable to serialize the generated XML.');
@@ -36,6 +43,9 @@ class GenerateCfdi40 extends Command
             if (file_put_contents($output, $xml) === false) {
                 throw new RuntimeException("Unable to write XML file: {$output}");
             }
+
+            $xsd = $xsdValidator->validate($document);
+            $advisory = $xsd['valid'] ? $advisoryValidator->validate($document) : ['findings' => []];
         } catch (JsonException $exception) {
             $this->error("Invalid JSON: {$exception->getMessage()}");
 
@@ -48,12 +58,25 @@ class GenerateCfdi40 extends Command
 
         $this->info("Generated XML: {$output}");
 
+        if (! $xsd['valid']) {
+            $this->error('XSD validation: failed.');
+            foreach ($xsd['errors'] as $error) {
+                $this->error("Line {$error['line']}, column {$error['column']}: {$error['message']}");
+            }
+
+            return self::FAILURE;
+        }
+
+        $this->info('XSD validation: valid.');
+        $this->reportAdvisoryFindings($advisory['findings']);
+
         return self::SUCCESS;
     }
 
     private function inputData(): array
     {
-        $path = $this->resolvePath($this->argument('input'));
+        $inputPath = $this->argument('input');
+        $path = str_starts_with($inputPath, DIRECTORY_SEPARATOR) ? $inputPath : base_path($inputPath);
         if (! is_file($path) || ! is_readable($path)) {
             throw new InvalidArgumentException("Input file is missing or unreadable: {$path}");
         }
@@ -66,8 +89,18 @@ class GenerateCfdi40 extends Command
         return $input;
     }
 
-    private function resolvePath(string $path): string
+    private function reportAdvisoryFindings(array $findings): void
     {
-        return str_starts_with($path, DIRECTORY_SEPARATOR) ? $path : base_path($path);
+        if ($findings === []) {
+            $this->line('Advisory findings: none.');
+
+            return;
+        }
+
+        $this->line('Advisory findings:');
+        foreach ($findings as $finding) {
+            $status = $finding['expected'] ? 'Expected warning' : $finding['status'];
+            $this->line("- {$status} {$finding['code']}: {$finding['title']}");
+        }
     }
 }
