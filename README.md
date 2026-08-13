@@ -4,13 +4,13 @@ A focused Laravel technical-test project for generating and validating CFDI 4.0 
 
 ## Status
 
-Phases 1 and 2 are complete. The project provides a Docker-based Laravel command foundation, PHP 8.4 with `bcmath` and XML support, local official SAT XSD files, strict `Ingreso` JSON validation, and decimal-safe CFDI calculations.
+Phases 1 through 3 are complete. The project provides a Docker-based Laravel command foundation, PHP 8.4 with `bcmath` and XML support, local official SAT XSD files, strict `Ingreso` JSON validation, decimal-safe CFDI calculations, and programmatic CFDI XML generation.
 
 ## Scope
 
 The first implementation supports CFDI `Ingreso` documents. It will calculate amounts with `bcmath`, build XML with `DOMDocument`, validate it against local SAT schemas, and expose the workflow through an Artisan command.
 
-Real certificates, signatures, PAC integration, and timbrado are intentionally out of scope.
+Real certificates, signatures, PAC integration, and timbrado are intentionally out of scope. Generated XML uses syntactically valid demonstration `Sello`, `NoCertificado`, and `Certificado` values only; it is neither legally valid nor timbrado.
 
 ## Development
 

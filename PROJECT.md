@@ -39,7 +39,7 @@ It is a demonstration only. PAC integration, timbrado, CSD files, certificates, 
 - Calculate concept amounts, IVA, subtotal, transferred taxes, and total using `bcmath`.
 - Add the type dispatcher and the `Ingreso` handler.
 
-### 3. CFDI XML generation — pending
+### 3. CFDI XML generation — complete
 
 - Build the `Ingreso` XML with `DOMDocument` and required CFDI 4.0 nodes.
 - Add XSD-required demonstration `Sello`, `NoCertificado`, and `Certificado` values; document that they are not legal or signed values.
