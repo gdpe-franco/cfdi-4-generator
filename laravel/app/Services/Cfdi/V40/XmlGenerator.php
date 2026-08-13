@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Cfdi;
+namespace App\Services\Cfdi\V40;
 
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -11,7 +11,7 @@ use DOMDocument;
 use DOMElement;
 use InvalidArgumentException;
 
-class CfdiXmlGenerator
+class XmlGenerator
 {
     private const XSI_NAMESPACE = 'http://www.w3.org/2001/XMLSchema-instance';
 
@@ -46,7 +46,7 @@ class CfdiXmlGenerator
             'MetodoPago' => $comprobante['metodoPago'],
             'LugarExpedicion' => $comprobante['lugarExpedicion'],
         ]);
-        $root->setAttributeNS(self::XSI_NAMESPACE, 'xsi:schemaLocation', Cfdi40Schema::cfdi40SchemaLocation());
+        $root->setAttributeNS(self::XSI_NAMESPACE, 'xsi:schemaLocation', Schema::cfdi40SchemaLocation());
         $document->appendChild($root);
 
         $root->appendChild($this->element($document, 'Emisor', [
@@ -135,7 +135,7 @@ class CfdiXmlGenerator
 
     private function element(DOMDocument $document, string $name, array $attributes = []): DOMElement
     {
-        $element = $document->createElementNS(Cfdi40Schema::CFDI_NAMESPACE, "cfdi:{$name}");
+        $element = $document->createElementNS(Schema::CFDI_NAMESPACE, "cfdi:{$name}");
 
         foreach ($attributes as $name => $value) {
             $element->setAttribute($name, $value);

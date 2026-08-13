@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Services\Cfdi;
+namespace Tests\Unit\Services\Cfdi\V40;
 
-use App\Services\Cfdi\CfdiInputValidator;
+use App\Services\Cfdi\V40\InputValidator;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class CfdiInputValidatorTest extends TestCase
+class InputValidatorTest extends TestCase
 {
     public function test_defaults_type(): void
     {
         $input = $this->fixture();
         unset($input['comprobante']['tipoDeComprobante']);
 
-        $normalized = (new CfdiInputValidator)->normalize($input);
+        $normalized = (new InputValidator)->normalize($input);
 
         $this->assertSame('I', $normalized['comprobante']['tipoDeComprobante']);
     }
@@ -29,7 +29,7 @@ class CfdiInputValidatorTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($message);
-        (new CfdiInputValidator)->normalize($input);
+        (new InputValidator)->normalize($input);
     }
 
     public static function invalidInputProvider(): iterable
@@ -42,7 +42,7 @@ class CfdiInputValidatorTest extends TestCase
 
     private function fixture(): array
     {
-        return json_decode(file_get_contents(__DIR__.'/../../../Fixtures/cfdi-input.json'), true, 512, JSON_THROW_ON_ERROR);
+        return json_decode(file_get_contents(__DIR__.'/../../../../Fixtures/cfdi-input.json'), true, 512, JSON_THROW_ON_ERROR);
     }
 
     private function setValue(array &$input, string $path, mixed $value): void

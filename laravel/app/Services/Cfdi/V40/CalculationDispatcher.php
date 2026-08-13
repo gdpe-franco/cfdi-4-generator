@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Cfdi;
+namespace App\Services\Cfdi\V40;
 
 use InvalidArgumentException;
 
-class CfdiCalculationDispatcher
+class CalculationDispatcher
 {
     public function __construct(
-        private CfdiInputValidator $inputValidator,
+        private InputValidator $inputValidator,
         private IngresoCalculator $ingresoCalculator,
     ) {}
 

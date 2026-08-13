@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Cfdi;
+namespace App\Services\Cfdi\V40;
 
-class Cfdi40Schema
+class Schema
 {
     public const CFDI_NAMESPACE = 'http://www.sat.gob.mx/cfd/4';
 
@@ -16,7 +16,7 @@ class Cfdi40Schema
 
     public static function xsdRoot(): string
     {
-        return dirname(__DIR__, 3).self::XSD_ROOT;
+        return dirname(__DIR__, 4).self::XSD_ROOT;
     }
 
     public static function cfdi40Schema(): string

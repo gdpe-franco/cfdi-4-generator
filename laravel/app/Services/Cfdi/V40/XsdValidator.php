@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Cfdi;
+namespace App\Services\Cfdi\V40;
 
 use DOMDocument;
 
-class CfdiXsdValidator
+class XsdValidator
 {
     public function validate(DOMDocument $document): array
     {
@@ -14,7 +14,7 @@ class CfdiXsdValidator
         libxml_clear_errors();
 
         try {
-            $valid = $document->schemaValidate(Cfdi40Schema::cfdi40Schema());
+            $valid = $document->schemaValidate(Schema::cfdi40Schema());
             $errors = array_map(
                 fn (\LibXMLError $error): array => [
                     'line' => $error->line,

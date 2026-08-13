@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Cfdi;
+namespace App\Services\Cfdi\V40;
 
 use CfdiUtils\CfdiValidator40;
 use CfdiUtils\XmlResolver\XmlResolver;
@@ -10,7 +10,7 @@ use DOMDocument;
 use Eclipxe\XmlResourceRetriever\Downloader\DownloaderInterface;
 use RuntimeException;
 
-class CfdiAdvisoryValidator
+class AdvisoryValidator
 {
     public function validate(DOMDocument $document): array
     {
@@ -20,7 +20,7 @@ class CfdiAdvisoryValidator
         }
 
         $resolver = new XmlResolver(
-            Cfdi40Schema::xsdRoot(),
+            Schema::xsdRoot(),
             new class implements DownloaderInterface
             {
                 public function downloadTo(string $source, string $destination)

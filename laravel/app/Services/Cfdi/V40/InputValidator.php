@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Cfdi;
+namespace App\Services\Cfdi\V40;
 
 use InvalidArgumentException;
 
-class CfdiInputValidator
+class InputValidator
 {
     private const IVA_RATES = ['0.000000', '0.080000', '0.160000'];
 
