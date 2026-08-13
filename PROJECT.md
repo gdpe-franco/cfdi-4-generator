@@ -44,7 +44,7 @@ It is a demonstration only. PAC integration, timbrado, CSD files, certificates, 
 - Build the `Ingreso` XML with `DOMDocument` and required CFDI 4.0 nodes.
 - Add XSD-required demonstration `Sello`, `NoCertificado`, and `Certificado` values; document that they are not legal or signed values.
 
-### 4. Local XSD validation — pending
+### 4. Local XSD validation — complete
 
 - Validate generated XML offline with `DOMDocument::schemaValidate()`.
 - Capture libxml errors with line, column, and message.

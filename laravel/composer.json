@@ -7,6 +7,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.4",
+        "eclipxe/cfdiutils": "^3.0",
         "laravel/framework": "^13.17"
     },
     "require-dev": {

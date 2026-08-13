@@ -64,6 +64,8 @@ Tax/accounting rules: correct treatment of the underlying operation
 2. Why must `libxml_use_internal_errors(true)` be restored after validation? What would be the risk of printing libxml errors directly from the service?
 3. What does a libxml line/column/message error tell a command user, and why is it more useful than a simple `false` validation result?
 4. Why is a successful XSD result the structural pass/fail gate, while CfdiUtils findings are advisory in this technical test?
+5. Why does CfdiUtils need PHP's XSL extension even though our own structural validator only uses DOMDocument and libxml?
+6. Why must an offline XML resolver reject a missing resource instead of silently downloading it?
 
 ## How to use this guide
 

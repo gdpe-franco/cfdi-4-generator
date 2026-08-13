@@ -13,9 +13,11 @@ use InvalidArgumentException;
 
 class CfdiXmlGenerator
 {
-    private const CFDI_NAMESPACE = 'http://www.sat.gob.mx/cfd/4';
-
     private const XSI_NAMESPACE = 'http://www.w3.org/2001/XMLSchema-instance';
+
+    private const IVA = '002';
+
+    private const TAX_FACTOR = 'Tasa';
 
     public function generate(array $calculation, ?DateTimeInterface $issuedAt = null): DOMDocument
     {
@@ -44,7 +46,7 @@ class CfdiXmlGenerator
             'MetodoPago' => $comprobante['metodoPago'],
             'LugarExpedicion' => $comprobante['lugarExpedicion'],
         ]);
-        $root->setAttributeNS(self::XSI_NAMESPACE, 'xsi:schemaLocation', self::CFDI_NAMESPACE.' '.self::CFDI_NAMESPACE.'/cfdv40.xsd');
+        $root->setAttributeNS(self::XSI_NAMESPACE, 'xsi:schemaLocation', Cfdi40Schema::cfdi40SchemaLocation());
         $document->appendChild($root);
 
         $root->appendChild($this->element($document, 'Emisor', [
@@ -86,8 +88,8 @@ class CfdiXmlGenerator
         $traslados = $this->element($document, 'Traslados');
         $traslados->appendChild($this->element($document, 'Traslado', [
             'Base' => $concept['taxBase'],
-            'Impuesto' => '002',
-            'TipoFactor' => 'Tasa',
+            'Impuesto' => self::IVA,
+            'TipoFactor' => self::TAX_FACTOR,
             'TasaOCuota' => $concept['iva'],
             'Importe' => $concept['tax'],
         ]));
@@ -106,8 +108,8 @@ class CfdiXmlGenerator
         foreach ($this->taxGroups($calculation['concepts']) as $rate => $group) {
             $traslados->appendChild($this->element($document, 'Traslado', [
                 'Base' => $group['base'],
-                'Impuesto' => '002',
-                'TipoFactor' => 'Tasa',
+                'Impuesto' => self::IVA,
+                'TipoFactor' => self::TAX_FACTOR,
                 'TasaOCuota' => $rate,
                 'Importe' => $group['tax'],
             ]));
@@ -133,7 +135,7 @@ class CfdiXmlGenerator
 
     private function element(DOMDocument $document, string $name, array $attributes = []): DOMElement
     {
-        $element = $document->createElementNS(self::CFDI_NAMESPACE, "cfdi:{$name}");
+        $element = $document->createElementNS(Cfdi40Schema::CFDI_NAMESPACE, "cfdi:{$name}");
 
         foreach ($attributes as $name => $value) {
             $element->setAttribute($name, $value);

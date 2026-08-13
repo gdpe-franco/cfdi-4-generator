@@ -4,7 +4,7 @@ A focused Laravel technical-test project for generating and validating CFDI 4.0 
 
 ## Status
 
-Phases 1 through 3 are complete. The project provides a Docker-based Laravel command foundation, PHP 8.4 with `bcmath` and XML support, local official SAT XSD files, strict `Ingreso` JSON validation, decimal-safe CFDI calculations, and programmatic CFDI XML generation.
+Phases 1 through 4 are complete. The project provides a Docker-based Laravel command foundation, PHP 8.4 with `bcmath`, XSL, and XML support, local official SAT XSD files, strict `Ingreso` JSON validation, decimal-safe CFDI calculations, programmatic CFDI XML generation, offline XSD validation, and advisory CfdiUtils findings.
 
 ## Scope
 

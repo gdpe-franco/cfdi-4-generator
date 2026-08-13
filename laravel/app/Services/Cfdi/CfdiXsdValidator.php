@@ -14,7 +14,7 @@ class CfdiXsdValidator
         libxml_clear_errors();
 
         try {
-            $valid = $document->schemaValidate(dirname(__DIR__, 3).'/resources/xsd/cfdv40.xsd');
+            $valid = $document->schemaValidate(Cfdi40Schema::cfdi40Schema());
             $errors = array_map(
                 fn (\LibXMLError $error): array => [
                     'line' => $error->line,
