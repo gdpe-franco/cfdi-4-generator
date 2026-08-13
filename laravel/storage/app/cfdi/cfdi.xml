@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="4.0" Serie="KUAF" Folio="7189" Fecha="2026-08-13T00:19:45" Sello="REVNT05TVFJBVElPTi1PTkxZ" FormaPago="99" NoCertificado="00001000000500000000" Certificado="REVNT05TVFJBVElPTi1DRVJUSUZJQ0FURQ==" SubTotal="8026.46" Moneda="MXN" Total="9310.69" TipoDeComprobante="I" Exportacion="01" MetodoPago="PPD" LugarExpedicion="05120" xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd">
+  <cfdi:Emisor Rfc="EKU9003173C9" Nombre="ESCUELA KEMPER URGATE" RegimenFiscal="601"/>
+  <cfdi:Receptor Rfc="CNC140828PQ4" Nombre="CENTRO NACIONAL DE CONTROL DE ENERGIA" DomicilioFiscalReceptor="01010" RegimenFiscalReceptor="603" UsoCFDI="G01"/>
+  <cfdi:Conceptos>
+    <cfdi:Concepto ClaveProdServ="83101800" Cantidad="1" ClaveUnidad="ZZ" Unidad="Mutuamente definido" Descripcion="20250206C010K18-A15030:Excedente de la liquidación de los DFT en el MDA a cargas indirectamente modeladas" ValorUnitario="2296.26" Importe="2296.260000" ObjetoImp="02">
+      <cfdi:Impuestos>
+        <cfdi:Traslados>
+          <cfdi:Traslado Base="2296.260000" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="367.401600"/>
+        </cfdi:Traslados>
+      </cfdi:Impuestos>
+    </cfdi:Concepto>
+    <cfdi:Concepto ClaveProdServ="83101800" Cantidad="1" ClaveUnidad="ZZ" Unidad="Mutuamente definido" Descripcion="20250206C010K18-A19110:Transacciones bilaterales financieras en el MDA al receptor" ValorUnitario="5567.40" Importe="5567.400000" ObjetoImp="02">
+      <cfdi:Impuestos>
+        <cfdi:Traslados>
+          <cfdi:Traslado Base="5567.400000" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="890.784000"/>
+        </cfdi:Traslados>
+      </cfdi:Impuestos>
+    </cfdi:Concepto>
+    <cfdi:Concepto ClaveProdServ="83101800" Cantidad="1" ClaveUnidad="ZZ" Unidad="Mutuamente definido" Descripcion="20250206C010K18-B25180:Reembolso del exceso de cobro por congestión colectado en el MTR" ValorUnitario="162.80" Importe="162.800000" ObjetoImp="02">
+      <cfdi:Impuestos>
+        <cfdi:Traslados>
+          <cfdi:Traslado Base="162.800000" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="26.048000"/>
+        </cfdi:Traslados>
+      </cfdi:Impuestos>
+    </cfdi:Concepto>
+  </cfdi:Conceptos>
+  <cfdi:Impuestos TotalImpuestosTrasladados="1284.23">
+    <cfdi:Traslados>
+      <cfdi:Traslado Base="8026.460000" Impuesto="002" TipoFactor="Tasa" TasaOCuota="0.160000" Importe="1284.233600"/>
+    </cfdi:Traslados>
+  </cfdi:Impuestos>
+</cfdi:Comprobante>

@@ -50,7 +50,7 @@ It is a demonstration only. PAC integration, timbrado, CSD files, certificates, 
 - Capture libxml errors with line, column, and message.
 - Configure CfdiUtils with local SAT resources and report its applicable CFDI assertions separately from structural XSD validity.
 
-### 5. Artisan command and artifact — in progress
+### 5. Artisan command and artifact — complete
 
 - Add `cfdi:40:generate`, fixed output, clear summaries, and non-zero failure statuses.
 - Generate and commit the example XML.
