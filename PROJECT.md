@@ -12,14 +12,14 @@ It is a demonstration only. PAC integration, timbrado, CSD files, certificates, 
 - Use `bcmath` for monetary calculations; do not use PHP floats.
 - Build XML with `DOMDocument`, never a static XML template.
 - Validate offline using `DOMDocument::schemaValidate()` and local SAT XSD dependencies.
-- The primary interface is `php artisan cfdi:generate <input> --output=<xml>`.
+- The primary interface is `php artisan cfdi:40:generate <input>`.
 
 ## Decisions
 
 - `Ingreso` (`I`) is the default and only implemented `TipoDeComprobante`.
 - A small dispatcher selects a type-specific handler. Adding another CFDI type later requires a new handler; no unimplemented handlers or database repositories will be created now.
 - `Fecha` is created automatically in the `America/Mexico_City` timezone and written to the XML. It is not read from JSON.
-- The command writes timestamped files under `storage/app/cfdi/`; the generated example XML is committed there.
+- The command always writes `storage/app/cfdi/cfdi.xml`; the generated example XML is committed there.
 - The first input contract supports the supplied shape: concepts with one IVA `Traslado`; no retentions, discounts, or complements.
 - Validation includes JSON/schema-shape checks, decimal and non-negative monetary values, required fields, calculation consistency, and local SAT XSD validation.
 - `eclipxe/cfdiutils` provides an advisory CFDI-rule report using local SAT resources. Findings caused solely by demonstration certificate or seal values are shown as expected warnings. `DOMDocument::schemaValidate()` remains the command's pass/fail structural gate.
@@ -50,9 +50,9 @@ It is a demonstration only. PAC integration, timbrado, CSD files, certificates, 
 - Capture libxml errors with line, column, and message.
 - Configure CfdiUtils with local SAT resources and report its applicable CFDI assertions separately from structural XSD validity.
 
-### 5. Artisan command and artifact — pending
+### 5. Artisan command and artifact — in progress
 
-- Add `cfdi:generate`, timestamped output, clear summaries, and non-zero failure statuses.
+- Add `cfdi:40:generate`, fixed output, clear summaries, and non-zero failure statuses.
 - Generate and commit the example XML.
 
 ### 6. Verification and documentation — pending
