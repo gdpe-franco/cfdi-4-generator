@@ -31,18 +31,28 @@ class AdvisoryValidator
         );
         $asserts = (new CfdiValidator40($resolver))->validateXml($xml);
         $findings = [];
+        $skipped = [];
 
         foreach ($asserts as $assert) {
-            $expected = str_starts_with($assert->getCode(), 'SELLO') && $assert->getStatus()->isError();
-            $findings[] = [
+            $finding = [
                 'code' => $assert->getCode(),
-                'status' => $expected ? 'WARN' : (string) $assert->getStatus(),
+                'status' => (string) $assert->getStatus(),
                 'title' => $assert->getTitle(),
                 'explanation' => $assert->getExplanation(),
-                'expected' => $expected,
             ];
+
+            if ($this->isOutOfScope($finding['code'])) {
+                $skipped[] = $finding;
+            } elseif (! $assert->getStatus()->isOk()) {
+                $findings[] = $finding;
+            }
         }
 
-        return ['findings' => $findings];
+        return ['findings' => $findings, 'skipped' => $skipped];
+    }
+
+    private function isOutOfScope(string $code): bool
+    {
+        return str_starts_with($code, 'SELLO') || str_starts_with($code, 'TFD');
     }
 }

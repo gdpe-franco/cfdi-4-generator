@@ -26,6 +26,16 @@ Error matrix/PAC: additional issuance and certification checks
 Tax/accounting rules: correct treatment of the underlying operation
 ```
 
+## Current validation model
+
+This project uses three implementation layers, in execution order:
+
+1. **Input, catalog, and filling-guide rules:** `InputValidator`, `SatCatalog`, and `IngresoBusinessValidator` reject unsupported input before XML generation. The current `Ingreso` rules include `FormaPago`/`MetodoPago`, the `UsoCFDI`/`RegimenFiscalReceptor` relationship, generic foreign RFC values, and the unsupported `Exportacion=02` scenario.
+2. **Official XML/XSD structure:** `XsdValidator` uses the local SAT XSD tree through `DOMDocument::schemaValidate()`. This is a command pass/fail gate, but it does not prove a transaction is fiscally valid.
+3. **CfdiUtils supplemental structure:** `AdvisoryValidator` uses the same local resources. Applicable findings are advisory. `SELLO*` and `TFD*` checks are skipped because a real certificate, signature, and `TimbreFiscalDigital` are out of scope; their codes are written to Laravel's log rather than shown as passed or failed certificate checks.
+
+The bundled `phpcfdi/sat-catalogos` SQLite file is read-only reference data, not an application database. Its pinned upstream release and checksum are recorded in `laravel/resources/sat/README.md`. Updating it is a reviewed dependency-resource update, never a runtime download.
+
 ## Phase 1 — Project boundaries
 
 1. What is the difference between generating a CFDI-shaped XML, validating it with an XSD, signing it with a CSD, and timbrado by a PAC?

@@ -21,8 +21,8 @@ It is a demonstration only. PAC integration, timbrado, CSD files, certificates, 
 - `Fecha` is created automatically in the `America/Mexico_City` timezone and written to the XML. It is not read from JSON.
 - The command always writes `storage/app/cfdi/cfdi.xml`; the generated example XML is committed there.
 - The first input contract supports the supplied shape: concepts with one IVA `Traslado`; no retentions, discounts, or complements.
-- Validation includes JSON/schema-shape checks, decimal and non-negative monetary values, required fields, calculation consistency, and local SAT XSD validation.
-- `eclipxe/cfdiutils` provides an advisory CFDI-rule report using local SAT resources. Findings caused solely by demonstration certificate or seal values are shown as expected warnings. `DOMDocument::schemaValidate()` remains the command's pass/fail structural gate.
+- Validation has three layers: input/catalog/filling-guide checks, local SAT XSD validation, and supplemental CfdiUtils structural checks.
+- The first two layers are command pass/fail gates. CfdiUtils findings are advisory; out-of-scope certificate, signature, and timbre checks are logged as skipped, never presented as passed checks.
 
 ## Phases
 

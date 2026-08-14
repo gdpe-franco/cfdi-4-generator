@@ -19,7 +19,8 @@ class GenerateCfdi40Test extends TestCase
             $this->artisan('cfdi:40:generate', ['input' => $input])
                 ->expectsOutput("Generated XML: {$output}")
                 ->expectsOutput('XSD validation: valid.')
-                ->expectsOutputToContain('Advisory findings:')
+                ->expectsOutput('CfdiUtils structural checks: passed.')
+                ->expectsOutputToContain('CfdiUtils checks skipped:')
                 ->assertExitCode(Command::SUCCESS);
 
             $this->assertFileExists($output);

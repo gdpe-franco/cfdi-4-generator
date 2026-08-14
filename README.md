@@ -33,8 +33,8 @@ The XML is always written to [laravel/storage/app/cfdi/cfdi.xml](laravel/storage
 The command prints:
 
 - the generated path;
-- the local XSD pass/fail result, including line, column, and message on failure; and
-- separate advisory findings from CfdiUtils. Findings caused by demonstration `Sello`, `NoCertificado`, or `Certificado` values are marked as expected warnings.
+- validation summaries; XSD failures include line, column, and message; and
+- the count of out-of-scope certificate, signature, and timbre checks recorded in Laravel's standard log.
 
 ## Tests and formatting
 
@@ -82,19 +82,17 @@ Intermediate concept amounts, bases, and taxes use six decimal places. Monetary 
 
 The initial contract supports one IVA `Traslado` per concept at `0.000000`, `0.080000`, or `0.160000`; it does not support retentions, discounts, complements, or other tax scenarios.
 
-## Offline XSD validation
+## Validation layers
 
-The official SAT `cfdv40.xsd` and its imported dependencies live under `laravel/resources/xsd/www.sat.gob.mx/`. `XsdValidator` passes the local `cfdv40.xsd` path directly to `DOMDocument::schemaValidate()`, so structural validation does not depend on network access. CfdiUtils uses the same local resource tree and rejects missing resources rather than downloading them.
+The command applies three distinct layers:
 
-XSD validation checks XML structure and schema constraints. It does not prove that the transaction is correct, the RFCs or catalog selections are valid for the parties, the certificate/signature is authentic, or a PAC/SAT will accept the document.
+1. Input, catalog, and filling-guide checks run before XML creation and fail the command when the supported `Ingreso` input is invalid.
+2. `DOMDocument::schemaValidate()` validates the generated XML with the bundled official SAT XSD dependencies and fails the command on an XSD error.
+3. CfdiUtils performs supplemental structural checks with the same local resources. Applicable findings are advisory; certificate, signature, and `TimbreFiscalDigital` checks are skipped because they are explicitly out of scope and their codes are logged.
 
-## Local catalog and business validation
+The project never downloads validation resources at runtime. The official XSD dependencies are under `laravel/resources/xsd/`, and the read-only SAT catalog resource is under `laravel/resources/sat/`.
 
-`phpcfdi/sat-catalogos` reads the bundled, read-only SAT catalog database in `laravel/resources/sat/catalogs.db`; its pinned upstream release and checksum are recorded beside the resource. The catalog database is reference data, not an application database, and it is never downloaded at runtime.
-
-`BusinessValidationDispatcher` selects `IngresoBusinessValidator` for the supported `Ingreso` model. It applies locally evaluable filling-guide rules before calculation: `FormaPago=99` requires `MetodoPago=PPD` and vice versa; `Exportacion=02` is rejected because this project does not generate the required Comercio Exterior complement; generic foreign RFC `XEXX010101000` requires `RegimenFiscalReceptor=616` and `UsoCFDI=S01`; and `UsoCFDI` must allow the supplied receiver regime according to the SAT catalog relation.
-
-This layer does not replace PAC/SAT checks. It cannot verify live RFC status, issuer registration, certificate validity, PAC-issued `Confirmacion`, or timbrado acceptance.
+For implementation and learning details, including the supported `Ingreso` filling-guide rules and catalog update process, see [CFDI_STUDY.md](docs/CFDI_STUDY.md).
 
 ## Important disclaimer
 
@@ -102,4 +100,4 @@ Structural XSD validity is not legal or fiscal validity. The generated XML is no
 
 ## Further reading
 
-See [PROJECT.md](PROJECT.md) for scope decisions and phases, and [CFDI_STUDY.md](docs/CFDI_STUDY.md) for a learning guide with official SAT resources.
+See [PROJECT.md](PROJECT.md) for scope decisions and phases.

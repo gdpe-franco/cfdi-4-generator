@@ -17,13 +17,12 @@ use PHPUnit\Framework\TestCase;
 
 class AdvisoryValidatorTest extends TestCase
 {
-    public function test_reports_expected_warnings(): void
+    public function test_skips_out_of_scope_checks(): void
     {
         $result = (new AdvisoryValidator)->validate($this->xml());
-        $warning = $this->finding($result['findings'], 'SELLO01');
+        $finding = $this->finding($result['skipped'], 'SELLO01');
 
-        $this->assertSame('WARN', $warning['status']);
-        $this->assertTrue($warning['expected']);
+        $this->assertSame('ERROR', $finding['status']);
     }
 
     public function test_reports_schema_failure(): void
@@ -35,7 +34,6 @@ class AdvisoryValidatorTest extends TestCase
         $failure = $this->finding($result['findings'], 'XSD01');
 
         $this->assertSame('ERROR', $failure['status']);
-        $this->assertFalse($failure['expected']);
     }
 
     private function xml(): DOMDocument

@@ -9,6 +9,7 @@ use App\Services\Cfdi\V40\CalculationDispatcher;
 use App\Services\Cfdi\V40\XmlGenerator;
 use App\Services\Cfdi\V40\XsdValidator;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 use JsonException;
 use RuntimeException;
@@ -45,7 +46,7 @@ class GenerateCfdi40 extends Command
             }
 
             $xsd = $xsdValidator->validate($document);
-            $advisory = $xsd['valid'] ? $advisoryValidator->validate($document) : ['findings' => []];
+            $advisory = $xsd['valid'] ? $advisoryValidator->validate($document) : ['findings' => [], 'skipped' => []];
         } catch (JsonException $exception) {
             $this->error("Invalid JSON: {$exception->getMessage()}");
 
@@ -68,7 +69,7 @@ class GenerateCfdi40 extends Command
         }
 
         $this->info('XSD validation: valid.');
-        $this->reportAdvisoryFindings($advisory['findings']);
+        $this->reportAdvisoryFindings($advisory['findings'], $advisory['skipped']);
 
         return self::SUCCESS;
     }
@@ -89,18 +90,25 @@ class GenerateCfdi40 extends Command
         return $input;
     }
 
-    private function reportAdvisoryFindings(array $findings): void
+    private function reportAdvisoryFindings(array $findings, array $skipped): void
     {
         if ($findings === []) {
-            $this->line('Advisory findings: none.');
+            $this->info('CfdiUtils structural checks: passed.');
+        } else {
+            $this->warn('CfdiUtils advisory findings:');
+            foreach ($findings as $finding) {
+                $this->line("- {$finding['status']} {$finding['code']}: {$finding['title']}");
+            }
+        }
 
+        if ($skipped === []) {
             return;
         }
 
-        $this->line('Advisory findings:');
-        foreach ($findings as $finding) {
-            $status = $finding['expected'] ? 'Expected warning' : $finding['status'];
-            $this->line("- {$status} {$finding['code']}: {$finding['title']}");
-        }
+        Log::info('CfdiUtils checks skipped for demonstration XML.', [
+            'count' => count($skipped),
+            'codes' => array_column($skipped, 'code'),
+        ]);
+        $this->line('CfdiUtils checks skipped: '.count($skipped).' certificate, signature, and timbre checks. Details are in the Laravel log.');
     }
 }
