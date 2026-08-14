@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7312d7f6b3ecb48ce7848926303d361c",
+    "content-hash": "2765b58e7caa4e199bb1ab1bb59dd303",
     "packages": [
         {
             "name": "brick/math",
@@ -2594,6 +2594,58 @@
                 }
             ],
             "time": "2026-02-16T23:10:27+00:00"
+        },
+        {
+            "name": "phpcfdi/sat-catalogos",
+            "version": "v0.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpcfdi/sat-catalogos.git",
+                "reference": "70133782ec84d7bab4d3e1ac147b15cbd2445b6d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpcfdi/sat-catalogos/zipball/70133782ec84d7bab4d3e1ac147b15cbd2445b6d",
+                "reference": "70133782ec84d7bab4d3e1ac147b15cbd2445b6d",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "ext-pdo": "*",
+                "ext-sqlite3": "*",
+                "php": ">=7.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.5.20"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PhpCfdi\\SatCatalogos\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Carlos C Soto",
+                    "email": "eclipxe13@gmail.com"
+                }
+            ],
+            "description": "Catálogos de SAT para CFDI 3.3, CFDI 4.0 y Nómina 1.2",
+            "homepage": "https://github.com/phpcfdi/sat-catalogos",
+            "keywords": [
+                "catalogos",
+                "cfdi",
+                "sat"
+            ],
+            "support": {
+                "issues": "https://github.com/phpcfdi/sat-catalogos/issues",
+                "source": "https://github.com/phpcfdi/sat-catalogos"
+            },
+            "time": "2023-07-04T16:44:16+00:00"
         },
         {
             "name": "phpoption/phpoption",

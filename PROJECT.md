@@ -59,3 +59,10 @@ It is a demonstration only. PAC integration, timbrado, CSD files, certificates, 
 
 - Add behavior-focused PHPUnit coverage for totals, successful generation/validation, and failures.
 - Polish the README, run Pint and tests through Docker, and generate the example XML.
+
+### 7. SAT cross-field validation — in progress
+
+- Add the complete official-derived SAT catalog database as a local SQLite resource and access it through `phpcfdi/sat-catalogos`; this is not an application database.
+- Add a dedicated validation layer for supported CFDI 4.0 `Ingreso` inputs, after contract validation and before calculation/XML generation.
+- Apply filling-guide rules that can be evaluated locally: `FormaPago`/`MetodoPago` compatibility, `UsoCFDI` compatibility with `RegimenFiscalReceptor`, foreign generic RFC rules, and unsupported Comercio Exterior requirements.
+- Keep XSD catalog-membership validation and CfdiUtils checks separate; do not claim PAC-only confirmation, live RFC, CSD, or timbrado validation.

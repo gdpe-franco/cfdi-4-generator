@@ -8,7 +8,8 @@
     "require": {
         "php": "^8.4",
         "eclipxe/cfdiutils": "^3.0",
-        "laravel/framework": "^13.17"
+        "laravel/framework": "^13.17",
+        "phpcfdi/sat-catalogos": "^0.3.1"
     },
     "require-dev": {
         "laravel/pint": "^1.27",
