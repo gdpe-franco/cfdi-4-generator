@@ -65,7 +65,7 @@ The `phpcfdi/sat-catalogos` SQLite file is read-only reference data, not an appl
 7. What does XSD stand for? Name four things an XSD can validate and four fiscal/business facts it cannot prove.
 8. Why do `Sello`, `NoCertificado`, and `Certificado` exist in a real CFDI? Why do we use placeholders in this technical test, and why must the result never be presented as legally valid?
 9. Why is `Fecha` generated using `America/Mexico_City` rather than trusted directly from input in this project?
-10. Why does `CfdiXmlGenerator` return a `DOMDocument` rather than writing a file itself? Which layer should report write failures to the user?
+10. Why does `XmlGenerator` return a `DOMDocument` rather than writing a file itself? Which layer should report write failures to the user?
 11. Compare `Ingreso`, `Egreso`, `Traslado`, `Pago`, and `Nómina`. Why does supporting a new `TipoDeComprobante` require more than accepting a new letter?
 
 ## Phase 4 — Structural validation
@@ -89,18 +89,18 @@ The `phpcfdi/sat-catalogos` SQLite file is read-only reference data, not an appl
 
 1. Why is the generated `cfdi.xml` committed even though `storage/app/` is normally ignored by Laravel projects?
 2. What does the command’s successful XSD result prove? List three facts that it still cannot prove about a real fiscal transaction.
-3. Explain how the README’s exact Docker commands make the project reproducible for a reviewer who has no PHP installation.
+3. Explain how `make setup` and the other Make commands make the project reproducible for someone who has Docker but no local PHP installation.
 4. Why do the tests cover concise happy and failure paths rather than attempting to reproduce every SAT catalog and PAC rule?
 
 ## Phase 7 — SAT catalogs and cross-field rules
 
-1. Why is the full SAT catalog resource stored as a read-only SQLite file rather than copied into PHP arrays, JSON, or an application database?
+1. Why is the full SAT catalog resource installed as a read-only SQLite file rather than copied into PHP arrays, JSON, or an application database?
 2. Explain the separate responsibilities of `CfdiUtils`, `phpcfdi/sat-catalogos`, the SAT catalog resource, and `IngresoBusinessValidator`.
 3. Why does XSD validation accept a code such as `G01` without necessarily proving it is compatible with the receiver's `RegimenFiscalReceptor`?
 4. Explain why `FormaPago=99` and `MetodoPago=PPD` must appear together for this supported `Ingreso` model. What later document is expected when payment is received?
 5. Why is `Exportacion=02` rejected here even though it is an existing catalog value? What is the difference between a valid catalog code and a supported document scenario?
 6. Which facts about `XEXX010101000` can be checked locally, and which still require SAT/PAC services or taxpayer records?
-7. Why must a catalog update be a reviewed, version-pinned dependency update rather than a runtime download?
+7. Why must a catalog update be a reviewed, version-pinned setup update rather than an XML-generation runtime download?
 
 ## Phase 8 — Type-specific dispatch
 
@@ -108,6 +108,21 @@ The `phpcfdi/sat-catalogos` SQLite file is read-only reference data, not an appl
 2. When adding `Egreso` (`E`), which three implementation pieces must be added or changed: its business validator, its calculator, and which dispatcher branches?
 3. Why should an `Egreso` input contract be extended deliberately instead of assuming every `Ingreso` field and rule applies unchanged?
 4. What is the difference between a type-specific business-validation failure and an XSD validation failure?
+
+## Phase 9 — Delivery and future integrations
+
+`make setup` is the repository entrypoint. It builds Docker, then runs Composer's Laravel-level `setup` script: dependency installation, `.env` creation when missing, application-key generation, configuration cleanup, and verified local catalog installation. Composer owns application bootstrap; Make owns the repeatable host command.
+
+CfdiUtils is already installed but deliberately used only for supplemental structure checks. Its wider scope includes CFDI creation and reading, local XSD validation, `cadena de origen`, certificate helpers, `Sello` validation, and `TimbreFiscalDigital` validation. `phpcfdi/sat-catalogos` supplies local catalog lookup objects; it does not perform PAC operations or manage catalog updates.
+
+InvoiceOne is a possible future PAC integration. Its published SOAP services cover timbrado, cancellation, and stamped XML retrieval. A real integration still needs a selected contract, provider credentials, protected CSD/PFX handling, retries and idempotency, persistence/audit controls, and an explicit cancellation workflow.
+
+1. Why is `make setup` the public project command while `composer setup` remains necessary underneath it?
+2. Which pieces of `composer setup` are Laravel bootstrap, and which one is CFDI-specific?
+3. Name three CfdiUtils capabilities that are intentionally not enabled here. Why does using the library not make the XML legally valid?
+4. What does `phpcfdi/sat-catalogos` provide, and what does it deliberately not provide?
+5. Why must a PAC integration be designed around its actual provider contract instead of treating timbrado as one generic HTTP call?
+6. Why are CSD/PFX storage, idempotency, and audit records essential before a production timbrado or cancellation feature?
 
 ## How to use this guide
 

@@ -1,79 +1,34 @@
 # CFDI 4.0 Technical Test
 
-## Scope
+## Purpose
 
-Build a Laravel command-line project in `laravel/` that reads structured JSON, creates a CFDI 4.0 `Ingreso` XML, saves it, and validates it against locally stored official SAT schemas.
+Build a Laravel CLI application in `laravel/` that reads JSON, generates a CFDI 4.0 `Ingreso` XML, writes the deliverable, and validates it locally.
 
-It is a demonstration only. PAC integration, timbrado, CSD files, certificates, real signatures, databases, APIs, UI, queues, and external integrations are out of scope.
+## Boundaries
 
-## Constraints
-
-- Docker Compose supplies PHP, Composer, `bcmath`, DOM, and libxml.
-- Use `bcmath` for monetary calculations; do not use PHP floats.
-- Build XML with `DOMDocument`, never a static XML template.
-- Validate offline using `DOMDocument::schemaValidate()` and local SAT XSD dependencies.
-- The primary interface is `php artisan cfdi:40:generate <input>`.
+- Docker Compose provides PHP, Composer, `bcmath`, DOM, and libxml.
+- XML is built programmatically with `DOMDocument`; monetary values use `bcmath`, never floats.
+- The primary command is `php artisan cfdi:40:generate <input>` and always writes `storage/app/cfdi/cfdi.xml`.
+- Official SAT XSD dependencies are committed locally. The PhpCfdi SQLite catalog is a pinned, verified setup resource—not an application database.
+- PAC, timbrado, CSD files, real signatures, live RFC checks, APIs, UI, queues, and unsupported document scenarios are out of scope.
 
 ## Decisions
 
-- `Ingreso` (`I`) is the default and only implemented `TipoDeComprobante`.
-- A small dispatcher selects a type-specific handler. Adding another CFDI type later requires a new handler; no unimplemented handlers or database repositories will be created now.
-- `Fecha` is created automatically in the `America/Mexico_City` timezone and written to the XML. It is not read from JSON.
-- The command always writes `storage/app/cfdi/cfdi.xml`; the generated example XML is committed there.
-- The first input contract supports the supplied shape: concepts with one IVA `Traslado`; no retentions, discounts, or complements.
-- Validation has three layers: input/catalog/filling-guide checks, local SAT XSD validation, and supplemental CfdiUtils structural checks.
-- The first two layers are command pass/fail gates. CfdiUtils findings are advisory; out-of-scope certificate, signature, and timbre checks are logged as skipped, never presented as passed checks.
+- `Ingreso` is the default and only implemented `TipoDeComprobante`; validation and calculation dispatch by type for future extension.
+- `Fecha` is generated in `America/Mexico_City`; it is not input data.
+- The input supports the supplied concepts with one IVA `Traslado`; no retentions, discounts, or complements.
+- Validation layers are: input/catalog/filling-guide gates, local XSD validation, then advisory CfdiUtils checks. Out-of-scope certificate, signature, and timbre findings are logged as skipped.
+- The generated example XML is intentionally committed. Other Laravel runtime storage remains ignored.
+- Future CSD, PAC, and application features are documented in the README as candidates, not implemented capabilities.
 
 ## Phases
 
-### 1. Bootstrap and local validation assets — complete
-
-- Create the Laravel application in `laravel/` and root Docker environment.
-- Trim unused Laravel web, database, and development defaults.
-- Store the official `cfdv40.xsd` and its local SAT dependencies under `laravel/resources/xsd/`.
-- Verify the Docker image can install dependencies and expose `bcmath`, DOM, and libxml.
-
-### 2. Input contract and calculation domain — complete
-
-- Define the JSON contract and explicit input/business checks.
-- Calculate concept amounts, IVA, subtotal, transferred taxes, and total using `bcmath`.
-- Add the type dispatcher and the `Ingreso` handler.
-
-### 3. CFDI XML generation — complete
-
-- Build the `Ingreso` XML with `DOMDocument` and required CFDI 4.0 nodes.
-- Add XSD-required demonstration `Sello`, `NoCertificado`, and `Certificado` values; document that they are not legal or signed values.
-
-### 4. Local XSD validation — complete
-
-- Validate generated XML offline with `DOMDocument::schemaValidate()`.
-- Capture libxml errors with line, column, and message.
-- Configure CfdiUtils with local SAT resources and report its applicable CFDI assertions separately from structural XSD validity.
-
-### 5. Artisan command and artifact — complete
-
-- Add `cfdi:40:generate`, fixed output, clear summaries, and non-zero failure statuses.
-- Generate and commit the example XML.
-
-### 6. Verification and documentation — complete
-
-- Add behavior-focused PHPUnit coverage for totals, successful generation/validation, and failures.
-- Polish the README, run Pint and tests through Docker, and generate the example XML.
-
-### 7. SAT cross-field validation — complete
-
-- Add the complete official-derived SAT catalog database as a local SQLite resource and access it through `phpcfdi/sat-catalogos`; this is not an application database.
-- Add a dedicated validation layer for supported CFDI 4.0 `Ingreso` inputs, after contract validation and before calculation/XML generation.
-- Apply filling-guide rules that can be evaluated locally: `FormaPago`/`MetodoPago` compatibility, `UsoCFDI` compatibility with `RegimenFiscalReceptor`, foreign generic RFC rules, and unsupported Comercio Exterior requirements.
-- Keep XSD catalog-membership validation and CfdiUtils checks separate; do not claim PAC-only confirmation, live RFC, CSD, or timbrado validation.
-
-### 8. Type-specific dispatch refinement — complete
-
-- Keep JSON contract normalization type-neutral after defaulting `TipoDeComprobante` to `I`.
-- Dispatch filling-guide validation and calculations by `TipoDeComprobante`, so a future type can add its own validator and calculator without altering `Ingreso` rules.
-
-### 9. Catalog resource delivery — complete
-
-- Keep the SAT catalog as a local SQLite runtime resource, but retrieve the pinned PhpCfdi release during setup instead of committing its large binary to normal Git.
-- Provide an idempotent installer and an explicit refresh option with SHA-256 verification.
-- Track the generated CFDI XML artifact while leaving other Laravel runtime storage ignored.
+1. Bootstrap, trimmed Laravel skeleton, Docker, and local SAT XSD assets — complete.
+2. JSON contract, decimal calculations, and `Ingreso` type dispatch — complete.
+3. DOM-based CFDI 4.0 XML generation with demonstration certificate fields — complete.
+4. Local XSD and supplemental CfdiUtils validation — complete.
+5. Static-output Artisan command and generated XML artifact — complete.
+6. PHPUnit coverage, formatting, and reviewer documentation — complete.
+7. Local SAT catalog and supported `Ingreso` cross-field validation — complete.
+8. Type-specific validation and calculation dispatch refinement — complete.
+9. Pinned catalog setup delivery and tracked XML artifact handling — complete.

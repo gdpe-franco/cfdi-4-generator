@@ -1,109 +1,80 @@
 # CFDI 4.0 Generator
 
-A focused Laravel technical test that reads structured JSON, creates a CFDI 4.0 `Ingreso` XML, saves it locally, and validates its structure against bundled official SAT schemas.
-
-This is a demonstration project. It does not integrate a PAC, perform timbrado, use `.cer` or `.key` files, produce a real `Sello`, or issue a legally valid invoice. It has no database, authentication, API, UI, queue, Docker runtime customization, or external runtime integration.
+A focused Laravel technical test that converts structured JSON into a CFDI 4.0 `Ingreso` XML and validates it locally. It is a demonstration, not an invoicing system.
 
 ## Requirements
 
 - Docker Compose
-- Docker permission for the current user
+- GNU Make
+- Permission to use Docker
 
-The container supplies PHP 8.4, Composer, `bcmath`, DOM, libxml, XSL, `curl`, and `bzip2`. The Laravel application is located in `laravel/`.
+The Laravel application lives in `laravel/`. Docker supplies PHP 8.4, Composer, `bcmath`, DOM, libxml, XSL, `curl`, and `bzip2`.
 
-## Installation
+## Run
 
 From the repository root:
 
 ```bash
-docker compose build
-docker compose run --rm php composer setup
+make setup
+make generate
 ```
 
-`composer setup` installs the pinned PhpCfdi SAT catalog release into ignored local storage and verifies its SHA-256. To refresh the configured release after intentionally updating its version and checksum, run:
+`make setup` builds the image, installs Composer dependencies, and downloads the pinned PhpCfdi SAT catalog resource with SHA-256 verification. `make generate` uses [input.json](laravel/resources/examples/input.json) and writes the tracked deliverable to [cfdi.xml](laravel/storage/app/cfdi/cfdi.xml).
+
+Useful commands:
 
 ```bash
-docker compose run --rm php php artisan cfdi:catalogs:install --update
+make test
+make format
+make catalogs-update
 ```
 
-## Generate the example XML
+`catalogs-update` refreshes the configured pinned catalog release; it never silently downloads an unpinned `latest` version.
 
-Run the command from the repository root:
+## Command outcomes
 
-```bash
-docker compose run --rm php php artisan cfdi:40:generate resources/examples/input.json
-```
+Successful generation writes the XML and reports the three validation layers:
 
-The XML is always written to [laravel/storage/app/cfdi/cfdi.xml](laravel/storage/app/cfdi/cfdi.xml). The committed file is regenerated from the supplied [input.json](laravel/resources/examples/input.json).
+![Successful generation](docs/images/generation-success.png)
 
-The command prints:
+The included [invalid IVA example](laravel/resources/examples/invalid-iva.json) demonstrates a concise input-contract failure and non-zero exit status:
 
-- the generated path;
-- validation summaries; XSD failures include line, column, and message; and
-- the count of out-of-scope certificate, signature, and timbre checks recorded in Laravel's standard log.
+![Input validation failure](docs/images/generation-failure.png)
 
-## Tests and formatting
+## What is implemented
 
-```bash
-docker compose run --rm php php artisan test
-docker compose run --rm php ./vendor/bin/pint
-```
+- `cfdi:40:generate <input>` validates JSON, calculates values with `bcmath`, creates XML through `DOMDocument`, writes `storage/app/cfdi/cfdi.xml`, and returns a non-zero status on failure.
+- The supported model is CFDI 4.0 `Ingreso` (`TipoDeComprobante=I`) with one IVA `Traslado` per `Concepto`.
+- The supplied input produces `SubTotal=8026.46`, IVA before document rounding of `1284.233600`, and `Total=9310.69`.
+- The generated document uses locally stored official SAT XSD dependencies. Its catalog resource is installed once into ignored `storage/app/sat/`, so XML generation and validation run offline afterwards.
 
-## Architecture
+## Validation model
 
-`App\\Services\\Cfdi\\V40` contains the CFDI 4.0 implementation:
+1. Input, SAT catalog, and supported filling-guide checks are command gates.
+2. `DOMDocument::schemaValidate()` performs local CFDI 4.0 XSD validation and reports line, column, and message on failure.
+3. CfdiUtils adds advisory structural checks. Certificate, signature, and `TimbreFiscalDigital` checks are logged as skipped because they are intentionally out of scope.
 
-| Component | Responsibility |
-| --- | --- |
-| `InputValidator` | Enforces the first JSON contract and explicit business-input checks. |
-| `SatCatalog` / `BusinessValidationDispatcher` / `IngresoBusinessValidator` | Reads the installed local SAT catalog resource, selects the validator for the CFDI type, and enforces supported filling-guide cross-field rules before calculation. |
-| `CalculationDispatcher` / `IngresoCalculator` | Selects the calculator for the CFDI type and calculates `Ingreso` amounts using `bcmath`. |
-| `XmlGenerator` | Builds every CFDI element and attribute with `DOMDocument`. |
-| `XsdValidator` | Runs `DOMDocument::schemaValidate()` and returns normalized libxml errors. |
-| `AdvisoryValidator` | Runs CfdiUtils checks with local SAT resources and no network fallback. |
-| `GenerateCfdi40` | Orchestrates input, generation, file output, validation, and terminal output. |
+## Design
 
-`Ingreso` (`TipoDeComprobante = I`) is the only implemented type. The two small dispatchers are the extension points for future type-specific validators and calculators; no unused type handlers or repositories are included.
+`App\Services\Cfdi\V40` separates input validation, type-specific calculation, XML construction, XSD validation, catalog lookup, and advisory checks. `Ingreso` is the only implemented type; compact dispatchers allow a later type to add its own validator and calculator without changing `Ingreso` behavior.
 
-## Calculations and rounding
+All monetary inputs remain decimal strings. Concept amounts and IVA use six decimal places; document totals use two decimal places and round half up. PHP floats are never used.
 
-All monetary values are decimal strings and are calculated with `bcmath`; PHP floats are never used.
+## Future implementation path
 
-For each `Concepto`:
+These capabilities are intentionally not enabled in this test:
 
-```text
-Importe = Cantidad × ValorUnitario
-Base = Importe
-IVA = Base × TasaOCuota
-```
+| Capability | Candidate tool | Notes |
+| --- | --- | --- |
+| CSD handling, `cadena de origen`, signature checks | Installed `eclipxe/cfdiutils` | The library also supports CFDI creation/reading, certificate helpers, XSD and signature validation. Real private-key handling requires secure secret storage. |
+| Additional local SAT rules and document types | Installed `phpcfdi/sat-catalogos` with `resources-sat-catalogs` | Provides queryable, versioned SAT catalog data; each CFDI type still needs its own filling-guide rules. |
+| Timbrado, cancellation, and stamped XML retrieval | InvoiceOne SOAP integration | InvoiceOne publishes CFDI 4.0 [timbrado](https://www.invoiceone.com.mx/soporte/servicio-de-timbrado/) and [cancellation/retrieval services](https://invoiceone.mx/TimbreCFDI/timbrecfdi.asmx). A production integration requires provider credentials, CSD/PFX policy, retries, persistence, and audit controls. |
+| API, UI, users, and persistence | Laravel features already available in the framework | Add only when the product requires them; they are deliberately absent here. |
 
-Intermediate concept amounts, bases, and taxes use six decimal places. Monetary document totals use two decimals, rounded half up for the non-negative amounts allowed by the input contract. The supplied example produces:
+## Out of scope
 
-| Value | Result |
-| --- | --- |
-| `SubTotal` | `8026.46` |
-| IVA before aggregate rounding | `1284.233600` |
-| `TotalImpuestosTrasladados` | `1284.23` |
-| `Total` | `9310.69` |
+PAC integration, timbrado, CSD files, real certificates, real signatures, `TimbreFiscalDigital`, databases, authentication, APIs, UI, queues, retentions, discounts, complements, and unsupported CFDI types.
 
-The initial contract supports one IVA `Traslado` per concept at `0.000000`, `0.080000`, or `0.160000`; it does not support retentions, discounts, complements, or other tax scenarios.
+Structural XSD validity is not legal or fiscal validity, SAT acceptance, or PAC acceptance. Do not use the generated XML as an invoice.
 
-## Validation layers
-
-The command applies three distinct layers:
-
-1. Input, catalog, and filling-guide checks run before XML creation and fail the command when the supported `Ingreso` input is invalid.
-2. `DOMDocument::schemaValidate()` validates the generated XML with the bundled official SAT XSD dependencies and fails the command on an XSD error.
-3. CfdiUtils performs supplemental structural checks with the same local resources. Applicable findings are advisory; certificate, signature, and `TimbreFiscalDigital` checks are skipped because they are explicitly out of scope and their codes are logged.
-
-The project never downloads validation resources while generating XML. Official XSD dependencies are under `laravel/resources/xsd/`; the read-only SQLite SAT catalog is installed under ignored `laravel/storage/app/sat/` during setup from its pinned PhpCfdi release.
-
-For implementation and learning details, including the supported `Ingreso` filling-guide rules and catalog update process, see [CFDI_STUDY.md](docs/CFDI_STUDY.md).
-
-## Important disclaimer
-
-Structural XSD validity is not legal or fiscal validity. The generated XML is not timbrado, has no `TimbreFiscalDigital`, and uses demonstration certificate/signature values. It must not be used as an invoice or presented as accepted by SAT or any PAC.
-
-## Further reading
-
-See [PROJECT.md](PROJECT.md) for scope decisions and phases.
+For project decisions, see [PROJECT.md](PROJECT.md).
