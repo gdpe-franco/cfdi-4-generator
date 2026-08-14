@@ -50,13 +50,14 @@ docker compose run --rm php ./vendor/bin/pint
 | Component | Responsibility |
 | --- | --- |
 | `InputValidator` | Enforces the first JSON contract and explicit business-input checks. |
-| `CalculationDispatcher` / `IngresoCalculator` | Selects `Ingreso` and calculates amounts using `bcmath`. |
+| `SatCatalog` / `BusinessValidationDispatcher` / `IngresoBusinessValidator` | Reads the bundled SAT catalog resource, selects the validator for the CFDI type, and enforces supported filling-guide cross-field rules before calculation. |
+| `CalculationDispatcher` / `IngresoCalculator` | Selects the calculator for the CFDI type and calculates `Ingreso` amounts using `bcmath`. |
 | `XmlGenerator` | Builds every CFDI element and attribute with `DOMDocument`. |
 | `XsdValidator` | Runs `DOMDocument::schemaValidate()` and returns normalized libxml errors. |
 | `AdvisoryValidator` | Runs CfdiUtils checks with local SAT resources and no network fallback. |
 | `GenerateCfdi40` | Orchestrates input, generation, file output, validation, and terminal output. |
 
-`Ingreso` (`TipoDeComprobante = I`) is the only implemented type. The small dispatcher is the extension point for a future type-specific calculator; no unused type handlers or repositories are included.
+`Ingreso` (`TipoDeComprobante = I`) is the only implemented type. The two small dispatchers are the extension points for future type-specific validators and calculators; no unused type handlers or repositories are included.
 
 ## Calculations and rounding
 
@@ -86,6 +87,14 @@ The initial contract supports one IVA `Traslado` per concept at `0.000000`, `0.0
 The official SAT `cfdv40.xsd` and its imported dependencies live under `laravel/resources/xsd/www.sat.gob.mx/`. `XsdValidator` passes the local `cfdv40.xsd` path directly to `DOMDocument::schemaValidate()`, so structural validation does not depend on network access. CfdiUtils uses the same local resource tree and rejects missing resources rather than downloading them.
 
 XSD validation checks XML structure and schema constraints. It does not prove that the transaction is correct, the RFCs or catalog selections are valid for the parties, the certificate/signature is authentic, or a PAC/SAT will accept the document.
+
+## Local catalog and business validation
+
+`phpcfdi/sat-catalogos` reads the bundled, read-only SAT catalog database in `laravel/resources/sat/catalogs.db`; its pinned upstream release and checksum are recorded beside the resource. The catalog database is reference data, not an application database, and it is never downloaded at runtime.
+
+`BusinessValidationDispatcher` selects `IngresoBusinessValidator` for the supported `Ingreso` model. It applies locally evaluable filling-guide rules before calculation: `FormaPago=99` requires `MetodoPago=PPD` and vice versa; `Exportacion=02` is rejected because this project does not generate the required Comercio Exterior complement; generic foreign RFC `XEXX010101000` requires `RegimenFiscalReceptor=616` and `UsoCFDI=S01`; and `UsoCFDI` must allow the supplied receiver regime according to the SAT catalog relation.
+
+This layer does not replace PAC/SAT checks. It cannot verify live RFC status, issuer registration, certificate validity, PAC-issued `Confirmacion`, or timbrado acceptance.
 
 ## Important disclaimer
 

@@ -35,7 +35,6 @@ class InputValidatorTest extends TestCase
     public static function invalidInputProvider(): iterable
     {
         yield 'unknown field' => ['receptor.misspelledField', 'value', 'receptor.misspelledField is not allowed.'];
-        yield 'unsupported type' => ['comprobante.tipoDeComprobante', 'E', 'comprobante.tipoDeComprobante "E" is not supported.'];
         yield 'unsupported IVA rate' => ['conceptos.0.iva', '0.100000', 'conceptos.0.iva must be one of: 0.000000, 0.080000, 0.160000.'];
         yield 'zero quantity' => ['conceptos.0.cantidad', '0', 'conceptos.0.cantidad must be a positive decimal with up to six decimal places.'];
     }

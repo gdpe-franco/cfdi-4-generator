@@ -82,6 +82,23 @@ Tax/accounting rules: correct treatment of the underlying operation
 3. Explain how the README’s exact Docker commands make the project reproducible for a reviewer who has no PHP installation.
 4. Why do the tests cover concise happy and failure paths rather than attempting to reproduce every SAT catalog and PAC rule?
 
+## Phase 7 — SAT catalogs and cross-field rules
+
+1. Why is the full SAT catalog resource stored as a read-only SQLite file rather than copied into PHP arrays, JSON, or an application database?
+2. Explain the separate responsibilities of `CfdiUtils`, `phpcfdi/sat-catalogos`, the SAT catalog resource, and `IngresoBusinessValidator`.
+3. Why does XSD validation accept a code such as `G01` without necessarily proving it is compatible with the receiver's `RegimenFiscalReceptor`?
+4. Explain why `FormaPago=99` and `MetodoPago=PPD` must appear together for this supported `Ingreso` model. What later document is expected when payment is received?
+5. Why is `Exportacion=02` rejected here even though it is an existing catalog value? What is the difference between a valid catalog code and a supported document scenario?
+6. Which facts about `XEXX010101000` can be checked locally, and which still require SAT/PAC services or taxpayer records?
+7. Why must a catalog update be a reviewed, version-pinned dependency update rather than a runtime download?
+
+## Phase 8 — Type-specific dispatch
+
+1. Why does `InputValidator` default `TipoDeComprobante` to `I` but leave support decisions to the dispatchers?
+2. When adding `Egreso` (`E`), which three implementation pieces must be added or changed: its business validator, its calculator, and which dispatcher branches?
+3. Why should an `Egreso` input contract be extended deliberately instead of assuming every `Ingreso` field and rule applies unchanged?
+4. What is the difference between a type-specific business-validation failure and an XSD validation failure?
+
 ## How to use this guide
 
 - Answer one phase before moving to the next implementation phase.

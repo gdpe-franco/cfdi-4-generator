@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services\Cfdi\V40;
 
+use App\Services\Cfdi\V40\BusinessValidationDispatcher;
 use App\Services\Cfdi\V40\CalculationDispatcher;
+use App\Services\Cfdi\V40\IngresoBusinessValidator;
 use App\Services\Cfdi\V40\IngresoCalculator;
 use App\Services\Cfdi\V40\InputValidator;
+use App\Services\Cfdi\V40\SatCatalog;
 use App\Services\Cfdi\V40\Schema;
 use App\Services\Cfdi\V40\XmlGenerator;
 use DateTimeImmutable;
@@ -44,6 +47,6 @@ class XmlGeneratorTest extends TestCase
     {
         $input = json_decode(file_get_contents(__DIR__.'/../../../../Fixtures/cfdi-input.json'), true, 512, JSON_THROW_ON_ERROR);
 
-        return (new CalculationDispatcher(new InputValidator, new IngresoCalculator))->calculate($input);
+        return (new CalculationDispatcher(new InputValidator, new BusinessValidationDispatcher(new IngresoBusinessValidator(new SatCatalog)), new IngresoCalculator))->calculate($input);
     }
 }

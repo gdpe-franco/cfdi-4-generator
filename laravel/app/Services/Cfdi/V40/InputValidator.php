@@ -35,10 +35,6 @@ class InputValidator
         $comprobante['tipoDeComprobante'] ??= 'I';
         $this->requireStrings($comprobante, self::COMPROBANTE_FIELDS, 'comprobante');
 
-        if ($comprobante['tipoDeComprobante'] !== 'I') {
-            throw new InvalidArgumentException("comprobante.tipoDeComprobante \"{$comprobante['tipoDeComprobante']}\" is not supported.");
-        }
-
         $this->assertStringObject($input['emisor'], self::EMISOR_FIELDS, 'emisor');
         $this->assertStringObject($input['receptor'], self::RECEPTOR_FIELDS, 'receptor');
 

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services\Cfdi\V40;
 
+use App\Services\Cfdi\V40\BusinessValidationDispatcher;
 use App\Services\Cfdi\V40\CalculationDispatcher;
+use App\Services\Cfdi\V40\IngresoBusinessValidator;
 use App\Services\Cfdi\V40\IngresoCalculator;
 use App\Services\Cfdi\V40\InputValidator;
+use App\Services\Cfdi\V40\SatCatalog;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -15,7 +18,7 @@ class CalculationDispatcherTest extends TestCase
     public function test_calculates_totals(): void
     {
         $input = json_decode(file_get_contents(__DIR__.'/../../../../Fixtures/cfdi-input.json'), true, 512, JSON_THROW_ON_ERROR);
-        $result = (new CalculationDispatcher(new InputValidator, new IngresoCalculator))->calculate($input);
+        $result = $this->dispatcher()->calculate($input);
 
         $this->assertSame('8026.460000', $result['subtotal']);
         $this->assertSame('1284.233600', $result['totalTransferredTaxes']);
@@ -32,6 +35,15 @@ class CalculationDispatcherTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('comprobante.tipoDeComprobante "E" is not supported.');
-        (new CalculationDispatcher(new InputValidator, new IngresoCalculator))->calculate($input);
+        $this->dispatcher()->calculate($input);
+    }
+
+    private function dispatcher(): CalculationDispatcher
+    {
+        return new CalculationDispatcher(
+            new InputValidator,
+            new BusinessValidationDispatcher(new IngresoBusinessValidator(new SatCatalog)),
+            new IngresoCalculator,
+        );
     }
 }

@@ -10,16 +10,21 @@ class CalculationDispatcher
 {
     public function __construct(
         private InputValidator $inputValidator,
+        private BusinessValidationDispatcher $businessValidator,
         private IngresoCalculator $ingresoCalculator,
     ) {}
 
     public function calculate(array $input): array
     {
         $normalized = $this->inputValidator->normalize($input);
+        $this->businessValidator->validate($normalized);
+        $type = $normalized['comprobante']['tipoDeComprobante'];
 
-        return match ($normalized['comprobante']['tipoDeComprobante']) {
-            'I' => $this->ingresoCalculator->calculate($normalized),
-            default => throw new InvalidArgumentException('Unsupported CFDI type.'),
-        };
+        switch ($type) {
+            case 'I':
+                return $this->ingresoCalculator->calculate($normalized);
+            default:
+                throw new InvalidArgumentException("comprobante.tipoDeComprobante \"{$type}\" is not supported.");
+        }
     }
 }
