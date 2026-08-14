@@ -32,3 +32,4 @@ Build a Laravel CLI application in `laravel/` that reads JSON, generates a CFDI 
 7. Local SAT catalog and supported `Ingreso` cross-field validation — complete.
 8. Type-specific validation and calculation dispatch refinement — complete.
 9. Pinned catalog setup delivery and tracked XML artifact handling — complete.
+10. Larastan static analysis for application code — complete.

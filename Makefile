@@ -1,4 +1,4 @@
-.PHONY: setup generate test format catalogs-update
+.PHONY: setup generate test format analyse catalogs-update
 
 setup:
 	docker compose build
@@ -12,6 +12,9 @@ test:
 
 format:
 	docker compose run --rm php ./vendor/bin/pint
+
+analyse:
+	docker compose run --rm php composer analyse
 
 catalogs-update:
 	docker compose run --rm php php artisan cfdi:catalogs:install --update

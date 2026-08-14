@@ -124,6 +124,15 @@ InvoiceOne is a possible future PAC integration. Its published SOAP services cov
 5. Why must a PAC integration be designed around its actual provider contract instead of treating timbrado as one generic HTTP call?
 6. Why are CSD/PFX storage, idempotency, and audit records essential before a production timbrado or cancellation feature?
 
+## Phase 10 — Static analysis
+
+Larastan combines PHPStan with Laravel-specific knowledge. Pint formats code; PHPUnit verifies exercised behavior; Larastan examines types and paths without running the application. This project analyzes `app/` at level 5 through `make analyse` and uses a 512 MiB analysis-only memory limit.
+
+1. What kinds of defects can Larastan find that Pint cannot?
+2. What kinds of defects can PHPUnit find that Larastan cannot prove?
+3. Why analyze only `app/` first instead of adding a baseline or treating existing test code as production code?
+4. Why does PHPStan's memory limit belong to the analysis command rather than the Laravel application configuration?
+
 ## How to use this guide
 
 - Answer one phase before moving to the next implementation phase.

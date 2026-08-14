@@ -26,6 +26,7 @@ Useful commands:
 ```bash
 make test
 make format
+make analyse
 make catalogs-update
 ```
 
