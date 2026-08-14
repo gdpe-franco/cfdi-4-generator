@@ -34,7 +34,7 @@ This project uses three implementation layers, in execution order:
 2. **Official XML/XSD structure:** `XsdValidator` uses the local SAT XSD tree through `DOMDocument::schemaValidate()`. This is a command pass/fail gate, but it does not prove a transaction is fiscally valid.
 3. **CfdiUtils supplemental structure:** `AdvisoryValidator` uses the same local resources. Applicable findings are advisory. `SELLO*` and `TFD*` checks are skipped because a real certificate, signature, and `TimbreFiscalDigital` are out of scope; their codes are written to Laravel's log rather than shown as passed or failed certificate checks.
 
-The bundled `phpcfdi/sat-catalogos` SQLite file is read-only reference data, not an application database. Its pinned upstream release and checksum are recorded in `laravel/resources/sat/README.md`. Updating it is a reviewed dependency-resource update, never a runtime download.
+The `phpcfdi/sat-catalogos` SQLite file is read-only reference data, not an application database. Setup installs its pinned upstream release and checksum-defined resource into `storage/app/sat/`. Updating it is a reviewed dependency-resource update, never an XML-generation runtime download.
 
 ## Phase 1 — Project boundaries
 

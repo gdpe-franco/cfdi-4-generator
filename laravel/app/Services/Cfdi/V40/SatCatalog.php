@@ -13,6 +13,10 @@ class SatCatalog
 {
     public function usoCfdi(string $id): UsoCfdi
     {
+        if (! is_file(Schema::satCatalogDatabase())) {
+            throw new InvalidArgumentException('SAT catalog resource is missing. Run php artisan cfdi:catalogs:install.');
+        }
+
         return (new Factory)
             ->catalogosFromDsn('sqlite:'.Schema::satCatalogDatabase())
             ->usosCfdi40()

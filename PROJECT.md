@@ -71,3 +71,9 @@ It is a demonstration only. PAC integration, timbrado, CSD files, certificates, 
 
 - Keep JSON contract normalization type-neutral after defaulting `TipoDeComprobante` to `I`.
 - Dispatch filling-guide validation and calculations by `TipoDeComprobante`, so a future type can add its own validator and calculator without altering `Ingreso` rules.
+
+### 9. Catalog resource delivery — complete
+
+- Keep the SAT catalog as a local SQLite runtime resource, but retrieve the pinned PhpCfdi release during setup instead of committing its large binary to normal Git.
+- Provide an idempotent installer and an explicit refresh option with SHA-256 verification.
+- Track the generated CFDI XML artifact while leaving other Laravel runtime storage ignored.

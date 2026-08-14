@@ -1,7 +1,7 @@
 FROM php:8.4-cli
 
 RUN apt-get update \
-    && apt-get install --yes --no-install-recommends libxslt1-dev libzip-dev unzip \
+    && apt-get install --yes --no-install-recommends bzip2 curl libxslt1-dev libzip-dev unzip \
     && docker-php-ext-install bcmath xsl zip \
     && rm -rf /var/lib/apt/lists/*
 

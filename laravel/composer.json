@@ -32,7 +32,8 @@
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
-            "@php artisan config:clear"
+            "@php artisan config:clear",
+            "@php artisan cfdi:catalogs:install"
         ],
         "test": [
             "@php artisan config:clear --ansi @no_additional_args",

@@ -1,4 +1,6 @@
 *
+!cfdi/
+!cfdi/*.xml
 !private/
 !public/
 !.gitignore

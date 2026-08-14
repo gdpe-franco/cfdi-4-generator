@@ -9,7 +9,7 @@ This is a demonstration project. It does not integrate a PAC, perform timbrado, 
 - Docker Compose
 - Docker permission for the current user
 
-The container supplies PHP 8.4, Composer, `bcmath`, DOM, libxml, and XSL. The Laravel application is located in `laravel/`.
+The container supplies PHP 8.4, Composer, `bcmath`, DOM, libxml, XSL, `curl`, and `bzip2`. The Laravel application is located in `laravel/`.
 
 ## Installation
 
@@ -18,6 +18,12 @@ From the repository root:
 ```bash
 docker compose build
 docker compose run --rm php composer setup
+```
+
+`composer setup` installs the pinned PhpCfdi SAT catalog release into ignored local storage and verifies its SHA-256. To refresh the configured release after intentionally updating its version and checksum, run:
+
+```bash
+docker compose run --rm php php artisan cfdi:catalogs:install --update
 ```
 
 ## Generate the example XML
@@ -50,7 +56,7 @@ docker compose run --rm php ./vendor/bin/pint
 | Component | Responsibility |
 | --- | --- |
 | `InputValidator` | Enforces the first JSON contract and explicit business-input checks. |
-| `SatCatalog` / `BusinessValidationDispatcher` / `IngresoBusinessValidator` | Reads the bundled SAT catalog resource, selects the validator for the CFDI type, and enforces supported filling-guide cross-field rules before calculation. |
+| `SatCatalog` / `BusinessValidationDispatcher` / `IngresoBusinessValidator` | Reads the installed local SAT catalog resource, selects the validator for the CFDI type, and enforces supported filling-guide cross-field rules before calculation. |
 | `CalculationDispatcher` / `IngresoCalculator` | Selects the calculator for the CFDI type and calculates `Ingreso` amounts using `bcmath`. |
 | `XmlGenerator` | Builds every CFDI element and attribute with `DOMDocument`. |
 | `XsdValidator` | Runs `DOMDocument::schemaValidate()` and returns normalized libxml errors. |
@@ -90,7 +96,7 @@ The command applies three distinct layers:
 2. `DOMDocument::schemaValidate()` validates the generated XML with the bundled official SAT XSD dependencies and fails the command on an XSD error.
 3. CfdiUtils performs supplemental structural checks with the same local resources. Applicable findings are advisory; certificate, signature, and `TimbreFiscalDigital` checks are skipped because they are explicitly out of scope and their codes are logged.
 
-The project never downloads validation resources at runtime. The official XSD dependencies are under `laravel/resources/xsd/`, and the read-only SAT catalog resource is under `laravel/resources/sat/`.
+The project never downloads validation resources while generating XML. Official XSD dependencies are under `laravel/resources/xsd/`; the read-only SQLite SAT catalog is installed under ignored `laravel/storage/app/sat/` during setup from its pinned PhpCfdi release.
 
 For implementation and learning details, including the supported `Ingreso` filling-guide rules and catalog update process, see [CFDI_STUDY.md](docs/CFDI_STUDY.md).
 
